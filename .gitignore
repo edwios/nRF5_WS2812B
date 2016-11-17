@@ -11,7 +11,7 @@ Icon
 *.out
 *.o
 *.d
-*.hex
+*.bak
 
 # Logs
 *.log
