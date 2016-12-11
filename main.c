@@ -71,7 +71,7 @@ bool m_color_changed = false;
 static ble_uuid_t m_uuid_type;
 static uint32_t m_rgb_color=0;
 
-/*
+
 void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
 {
     #ifdef DEBUG
@@ -81,7 +81,7 @@ void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
     LEDS_ON(LEDS_MASK);
     while(1);
 }
-*/
+
 /**@brief Function for assert macro callback.
  *
  * @details This function will be called in case of an assert in the SoftDevice.
@@ -154,7 +154,6 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
     switch (ble_adv_evt)
     {
         case BLE_ADV_EVT_FAST:
-            SEGGER_RTT_WriteString(0,"Fast advertising\r\n");
             err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
             APP_ERROR_CHECK(err_code);
             break;
@@ -320,29 +319,19 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
  */
 static void on_write(ble_evt_t * p_ble_evt)
 {
-
-    SEGGER_RTT_WriteString(0, "on_write\n");
-
     ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
     if ((p_evt_write->handle == m_our_service.char_handles.cccd_handle) && (p_evt_write->len == 2))
     {
         // CCCD written. Start notifications
-        SEGGER_RTT_WriteString(0, "on_write: cccd write\n");
         m_is_notifying_enabled = ble_srv_is_notification_enabled(p_evt_write->data);
     }
 
     if ((p_evt_write->handle == m_our_service.char_handles.value_handle) && (p_evt_write->len == 4))
     {
         // Update RGB LED value
-        //m_rgb_color = rgbled_update(&m_our_service);
         m_rgb_color = p_evt_write->data[3]<<24 | p_evt_write->data[2]<<16 | p_evt_write->data[1]<<8 | p_evt_write->data[0];
         m_color_changed = true;
-/*
-        char sv[64];
-        sprintf(sv, "on_write: rgbled write %#0lX\n", m_rgb_color);
-        SEGGER_RTT_WriteString(0, sv);
-*/
     }
 }
 
@@ -546,7 +535,6 @@ static void app_timeout_handler(void * p_context)
 
 static void led_handler()
 {
-//    SEGGER_RTT_WriteString(0, "LED toggle");
     if (m_is_advertising) {
         LEDS_INVERT(ADVERTISING_LED_PIN);
     } else {
@@ -564,7 +552,6 @@ static void buttons_init(void)
 {
     uint32_t err_code;
 
-    SEGGER_RTT_WriteString(0, "DEBUG: Buttons init\n");
     //The array must be static because a pointer to it will be saved in the button handler module.
     static app_button_cfg_t buttons[] =
     {
@@ -575,13 +562,13 @@ static void buttons_init(void)
                                BUTTON_DETECTION_DELAY);
     APP_ERROR_CHECK(err_code);
 }
+
 /**@brief Function for the LEDs initialization.
  *
  * @details Initializes all LEDs used by the application.
  */
 static void leds_init(void)
 {
-    SEGGER_RTT_WriteString(0, "DEBUG: LED init\n");
     LEDS_CONFIGURE(ADVERTISING_LED_PIN | CONNECTED_LED_PIN | LEDBUTTON_LED_PIN | CPU_LED_PIN);
     LEDS_OFF(ADVERTISING_LED_PIN | CONNECTED_LED_PIN | LEDBUTTON_LED_PIN);
     LEDS_ON(CPU_LED_PIN);    // LED on when CPU is on
@@ -596,7 +583,6 @@ static void timers_init(void)
 {
     uint32_t                err_code;
 
-    SEGGER_RTT_WriteString(0, "DEBUG: Timers init\n");
     // Initialize timer module, making it use the scheduler
     APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
     // Create timers.
@@ -617,7 +603,6 @@ static void ble_stack_init(void)
 {
     uint32_t err_code;
 
-    SEGGER_RTT_WriteString(0, "DEBUG: BLE stack init\n");
     nrf_clock_lf_cfg_t clock_lf_cfg = NRF_CLOCK_LFCLKSRC;
 
     // Initialize the SoftDevice handler module.
@@ -662,18 +647,7 @@ static void advertising_init(void)
 
     SEGGER_RTT_WriteString(0, "DEBUG: BLE Advertising Init!\n");
     ble_uuid_t more_adv_uuids[] = {{BLE_UUID_OUR_SERVICE_UUID, BLE_UUID_TYPE_BLE},
-{BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}};
-    /*
-    ble_uuid_t more_adv_uuids[] = {{BLE_UUID_OUR_SERVICE_UUID, m_uuid_type.type},
-                                    {BLE_UUID_BATTERY_SERVICE, BLE_UUID_TYPE_BLE},
-                                    {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}};
-*/
-    ble_advdata_manuf_data_t        manuf_data; // Variable to hold manufacturer specific data
-    uint8_t data[]                      = MANUFACTURER_NAME; // Our data to advertise
-    manuf_data.company_identifier       = COMPANY_ID; // NASTE company ID
-    manuf_data.data.p_data              = data;     
-    manuf_data.data.size                = sizeof(data);
-
+                                   {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}};
 
     // Build and set advertising data
     memset(&advdata, 0, sizeof(advdata));
@@ -682,22 +656,11 @@ static void advertising_init(void)
     advdata.short_name_len = 7; // Advertise only first 6 letters of name
     advdata.include_appearance = true;
     advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-//    advdata.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
-//    advdata.uuids_complete.p_uuids  = adv_uuids;
-
-    // Prepare the scan response Manufacturer specific data packet
-    ble_advdata_manuf_data_t                manuf_data_response;
-    uint8_t                                 data_response[] = MANUFACTURER_NAME; // Remember there is a 0 terminator at the end of string
-    manuf_data_response.company_identifier       = COMPANY_ID;               
-    manuf_data_response.data.p_data              = data_response;        
-    manuf_data_response.data.size                = sizeof(data_response);
 
     memset(&scanrsp, 0, sizeof(scanrsp));
     scanrsp.name_type               = BLE_ADVDATA_NO_NAME; 
-//    scanrsp.p_manuf_specific_data   = &manuf_data;
     scanrsp.uuids_complete.uuid_cnt = sizeof(more_adv_uuids) / sizeof(more_adv_uuids[0]);
     scanrsp.uuids_complete.p_uuids  = more_adv_uuids;
-//    scanrsp.p_manuf_specific_data = &manuf_data_response; // Error 12 oversize if added this :(
 
     memset(&options, 0, sizeof(options));
     options.ble_adv_fast_enabled  = false;
@@ -706,11 +669,7 @@ static void advertising_init(void)
 //    err_code = ble_advdata_set(&advdata, &scanrsp);   // works equally well
     m_is_advertising = false;
 
-    char str[255];
-    sprintf(str, "Error code: %lu\n", err_code);
-    SEGGER_RTT_WriteString(0, str);
     APP_ERROR_CHECK(err_code);
-    SEGGER_RTT_WriteString(0, "advertising_init: done\n");
 }
 
 /**@brief Function for the GAP initialization.
@@ -724,7 +683,6 @@ static void gap_params_init(void)
     ble_gap_conn_params_t   gap_conn_params;
     ble_gap_conn_sec_mode_t sec_mode;
 
-    SEGGER_RTT_WriteString(0, "DEBUG: BLE GAP Params init\n");
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
 
     err_code = sd_ble_gap_device_name_set(&sec_mode,
@@ -752,7 +710,6 @@ static void conn_params_init(void)
     uint32_t               err_code;
     ble_conn_params_init_t cp_init;
 
-    SEGGER_RTT_WriteString(0, "DEBUG: BLE Connection Params init\n");
     memset(&cp_init, 0, sizeof(cp_init));
 
     cp_init.p_conn_params                  = NULL;
@@ -778,7 +735,6 @@ static void peer_manager_init(bool erase_bonds)
     ble_gap_sec_params_t sec_param;
     ret_code_t           err_code;
 
-    SEGGER_RTT_WriteString(0, "DEBUG: Peer Manager init\n");
     err_code = pm_init();
     APP_ERROR_CHECK(err_code);
 
@@ -817,7 +773,6 @@ static void peer_manager_init(bool erase_bonds)
 static void services_init(void)
 {
     /* ### */
-    SEGGER_RTT_WriteString(0, "DEBUG: Services init\n");
     our_service_init(&m_our_service, &m_uuid_type);    
 
 }
@@ -832,7 +787,7 @@ static void application_timers_start(void)
     uint32_t err_code;
 
     // Start application timers.
-    err_code = app_timer_start(m_app_char_timer_id, UVINDEX_LEVEL_MEAS_INTERVAL, NULL);
+    err_code = app_timer_start(m_app_char_timer_id, LED_REFRESH_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -887,7 +842,6 @@ static void advertising_start(void)
     APP_ERROR_CHECK(err_code);
     adv_led_timer_start();
     m_is_advertising = true;
-//    LEDS_ON(ADVERTISING_LED_PIN);
 }
 
 /** Perform rainbow
@@ -898,7 +852,6 @@ static void do_rainbow(void)
     rgb_led_t led_array[NUM_LEDS];
     uint32_t current_limit;
 
-    SEGGER_RTT_WriteString(0,"Demo start\n");
     LEDS_INVERT(GOODLED);
     
     rainbow_init(NUM_LEDS);
@@ -933,41 +886,30 @@ static void do_rainbow(void)
     // Turn off LEDs
     ws2812b_drive_set_blank(led_array,NUM_LEDS);
     i2s_ws2812b_drive_xfer(led_array, NUM_LEDS, STDOUT);
-    // Wait 3s before restart the rainbow
-    SEGGER_RTT_WriteString(0,"Blank LED and Wait 3s\n");
     LEDS_ON(BLANKLED);
-    nrf_delay_ms(3000);
+    nrf_delay_ms(1000);
     LEDS_OFF(BLANKLED);
 }
 
 static void change_color(void)
 {
-    char sv[64];
-
     rgb_led_t led_array[NUM_LEDS];
     uint32_t current_limit;
 
-    SEGGER_RTT_WriteString(0,"DEBUG: Change Color\n");
     rainbow_init(NUM_LEDS);
+
     // work out the LED colors for each cycle 
     setcolor(led_array, m_rgb_color);
-
-    sprintf(sv, "Change Color: %lx\n", m_rgb_color);
-    SEGGER_RTT_WriteString(0, sv); 
 
     // Adjust total current used by LEDs to below the max allowed 
     current_limit = MAX_TOTAL_CURRENT;
     ws2812b_drive_current_cap(led_array, NUM_LEDS, current_limit);
-    SEGGER_RTT_WriteString(0, "current cap\n"); 
 
     if (i2s_ws2812b_drive_xfer(led_array, NUM_LEDS, STDOUT) != NRF_SUCCESS) {
         SEGGER_RTT_WriteString(0,"ERROR: Send to LED failed!\n");
-    } else {
-        SEGGER_RTT_WriteString(0, "OK send LED\n"); 
     }
 
     rainbow_uninit();
-    SEGGER_RTT_WriteString(0,"DEBUG: Sent to LED!\n");
 }
 
 /**@brief Function for the Power Manager.
@@ -989,10 +931,6 @@ int main(void)
 {
     ret_code_t err_code;
 
-//	LEDS_CONFIGURE(GOODLED | BLANKLED | BADLED);
-//	LEDS_OFF(GOODLED | BLANKLED| BADLED);
-	SEGGER_RTT_WriteString(0, "WS2812b Demo\n");
-
     // Initialize.
     err_code = NRF_LOG_INIT(NULL);
     APP_ERROR_CHECK(err_code);
@@ -1006,8 +944,6 @@ int main(void)
     services_init();
     advertising_init();
     conn_params_init();
-    SEGGER_RTT_WriteString(0, "INFO: BLE inited\n");
-
     advertising_start();
 
     do_rainbow();
@@ -1018,12 +954,11 @@ int main(void)
             m_color_changed = false;
             change_color();
         }
-/*        NRF_LOG_FLUSH();
+        NRF_LOG_FLUSH();
         if (NRF_LOG_PROCESS() == false)
         {
                 power_manage();
         }
-        */
 	}
    
 }

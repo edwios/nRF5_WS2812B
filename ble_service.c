@@ -38,7 +38,6 @@ static uint32_t our_char_add(ble_os_t * p_our_service, ble_gatts_char_handles_t*
     ble_uuid_t          char_uuid;
     ble_uuid128_t       base_uuid = BLE_UUID_OUR_BASE_UUID;
 
-//    SEGGER_RTT_WriteString(1, "DEBUG: Adding Characteristic UUID to Service\n");
     char_uuid.uuid = chuuid;
     err_code = sd_ble_uuid_vs_add(&base_uuid, &char_uuid.type);
     APP_ERROR_CHECK(err_code);
@@ -88,7 +87,6 @@ static uint32_t our_char_add(ble_os_t * p_our_service, ble_gatts_char_handles_t*
     attr_char_value.init_len    = 4;
     attr_char_value.p_value     = (uint8_t *)p_value;
 
-//    SEGGER_RTT_WriteString(1, "DEBUG: Adding Characteristic to GATT\n");
     // Add our new characteristic to the service
     err_code = sd_ble_gatts_characteristic_add(p_our_service->service_handle,
                                                 &char_md,
@@ -96,7 +94,6 @@ static uint32_t our_char_add(ble_os_t * p_our_service, ble_gatts_char_handles_t*
                                                 p_chandle);
     APP_ERROR_CHECK(err_code);
 
-    SEGGER_RTT_WriteString(0, "DEBUG: our_char_add: done\n");
     return NRF_SUCCESS;
 }
 
@@ -112,25 +109,7 @@ void our_service_init(ble_os_t * p_our_service, ble_uuid_t * service_uuid)
     ble_dis_init_t   dis_init;
     ble_dis_sys_id_t sys_id;
     uint32_t   err_code; // Variable to hold return codes from library and softdevice functions
-/*
-    // Initialize Battery Service.
-    memset(&bas_init, 0, sizeof(bas_init));
 
-    // Here the sec level for the Battery Service can be changed/increased.
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_char_attr_md.cccd_write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_char_attr_md.read_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&bas_init.battery_level_char_attr_md.write_perm);
-
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&bas_init.battery_level_report_read_perm);
-
-    bas_init.evt_handler          = NULL;
-    bas_init.support_notification = true;
-    bas_init.p_report_ref         = NULL;
-    bas_init.initial_batt_level   = 100;
-
-    err_code = ble_bas_init(m_bas, &bas_init);
-    APP_ERROR_CHECK(err_code);
-*/
     // Initialize Device Information Service.
     memset(&dis_init, 0, sizeof(dis_init));
 
@@ -150,20 +129,6 @@ void our_service_init(ble_os_t * p_our_service, ble_uuid_t * service_uuid)
     // Set our service connection handle to default value. I.e. an invalid handle since we are not yet in a connection.
     p_our_service->conn_handle = BLE_CONN_HANDLE_INVALID;
 
-    /*
-     * Using 128-bit UUID will cause both Battery and Device Info service invisible
-     *
-    // Declare 16-bit service and 128-bit base UUIDs and add them to the BLE stack
-    ble_uuid128_t     base_uuid = BLE_UUID_OUR_BASE_UUID;
-    service_uuid->uuid = BLE_UUID_OUR_SERVICE_UUID;
-    err_code = sd_ble_uuid_vs_add(&base_uuid, &service_uuid->type);
-
-    // Add our service
-    err_code = sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY,
-                                        service_uuid,
-                                        &p_our_service->service_handle);
-    */
-
     ble_uuid_t osuuid;
     osuuid.uuid = BLE_UUID_OUR_SERVICE_UUID;
     osuuid.type = BLE_UUID_TYPE_BLE;
@@ -176,58 +141,5 @@ void our_service_init(ble_os_t * p_our_service, ble_uuid_t * service_uuid)
 
     // Add RGB LED with notification DISABLED and write ENABLED characteristic to the service. 
     our_char_add(p_our_service, &p_our_service->char_handles, BLE_UUID_RGBLED_CHARACTERISTC_UUID, false, true, &srgb);
-
-    SEGGER_RTT_WriteString(0, "DEBUG: our_service_init: done\n");    
 }
 
-// Update LED characteristic value
-uint32_t rgbled_update(ble_os_t *p_our_service)
-{
-    uint32_t   err_code; // Variable to hold return codes from library and softdevice functions
-    uint32_t rgbv = 0;
-    uint8_t *p_rgbv;
-
-    char sv[64];
-/*
-    suvi = *uvi;
-    // Update characteristic value and push out as notification (thus hvx)
-    if (p_our_service->conn_handle != BLE_CONN_HANDLE_INVALID)
-    {
-        uint16_t               len = 2;
-        ble_gatts_hvx_params_t hvx_params;
-        memset(&hvx_params, 0, sizeof(hvx_params));
-
-        hvx_params.handle = p_our_service->char_handles.value_handle;
-        hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
-        hvx_params.offset = 0;
-        hvx_params.p_len  = &len;
-        hvx_params.p_data = (uint8_t*)&suvi;  
-
-        sd_ble_gatts_hvx(p_our_service->conn_handle, &hvx_params);
-    }
-*/
-
-
-    // Simply update our characteristic value
-    if (p_our_service->conn_handle != BLE_CONN_HANDLE_INVALID)
-    {
-        ble_gatts_value_t gatts_value;
-        gatts_value.len = 4;
-        gatts_value.offset = 0;
-        gatts_value.p_value = NULL;
-        err_code = sd_ble_gatts_value_get(p_our_service->conn_handle,
-                               p_our_service->char_handles.value_handle,
-                               &gatts_value);
-        APP_ERROR_CHECK(err_code);
-        p_rgbv = gatts_value.p_value;
-        if (p_rgbv == NULL) {
-            SEGGER_RTT_WriteString(0, "ERROR: Cannot get value\n");    
-//            return 0;
-        }
-        rgbv = (uint32_t)p_rgbv[1];
-//        rgbv = *(p_rgbv)<<24 | *(p_rgbv+1)<<16 | *(p_rgbv+2)<<8 | *(p_rgbv+3);
-        sprintf(sv, "RGBV: %lx\n", rgbv);
-        SEGGER_RTT_WriteString(0, sv);    
-    }
-    return rgbv;
-}

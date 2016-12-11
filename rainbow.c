@@ -6,7 +6,7 @@
  *
  */
 
-#include	"rainbow.h"
+#include "rainbow.h"
 #include "SEGGER_RTT.h"
 #include "SEGGER_RTT_Conf.h"
 
@@ -98,12 +98,6 @@ void setcolor(rgb_led_t * led_array_out, uint32_t rgbcolor)
 	rgbc8[1] = (uint8_t)((rgbcolor & 0x0000FF00)>>8);
 	rgbc8[2] = (uint8_t)((rgbcolor & 0x00FF0000)>>16);
 	rgbc8[3] = (uint8_t)((rgbcolor & 0xFF000000)>>24);
-
-/*
-    char sv[128];
-    sprintf(sv, "setcolor: RGB LED r:%0hx g:%0hx b:%0hx\n", rgbc8[1], rgbc8[2], rgbc8[3]);
-    SEGGER_RTT_WriteString(0, sv);
-*/
 
 	// update led_array_base
 	{

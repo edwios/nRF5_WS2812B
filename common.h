@@ -5,8 +5,6 @@ static void power_manage(void);
 static void change_color(void);
 static void do_rainbow(void);
 
-//static void sys_evt_dispatch(uint32_t sys_evt);
-//static void ble_evt_dispatch(ble_evt_t * p_ble_evt);
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void on_conn_params_evt(ble_conn_params_evt_t * p_evt);
 static void on_ble_evt(ble_evt_t * p_ble_evt);

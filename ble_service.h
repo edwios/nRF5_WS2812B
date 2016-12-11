@@ -15,14 +15,14 @@
 #include "device.h"
 
 // Defining 16-bit service and 128-bit base UUIDs
-// Base UUID 00000000-BB79-2CBE-7648-CFA9EBAAB65C
+// Base UUID 00000000-BB79-2CBE-7648-CFA9EBAAB65F
 // Little endian form and 12 & 13th octet are ignored
 #define BLE_UUID_OUR_BASE_UUID              	{{0x5F, 0xB6, 0xAA, 0xEB, 0xA9, 0xCF, 0x48, 0x76, 0xBE, 0x2C, 0x79, 0xBB, 0x00, 0x00, 0x00, 0x00}} // 128-bit base UUID
 // Environmental sensing UUiD (short) is 0x181A
 #define BLE_UUID_OUR_SERVICE_UUID               0x181a // Environmental Sensing
 
 // Defining various 16-bit characteristic UUIDs
-#define BLE_UUID_RGBLED_CHARACTERISTC_UUID			0xFF00 // UVA
+#define BLE_UUID_RGBLED_CHARACTERISTC_UUID			0xFF00 // RGB
 
 // This structure contains various status information for our service. 
 // The name is based on the naming convention used in Nordics SDKs. 
@@ -34,12 +34,6 @@ typedef struct
     uint16_t                    service_handle; /**< Handle of Our Service (as provided by the BLE stack). */
     // Add handles for the characteristic attributes to our struct
     ble_gatts_char_handles_t    char_handles;
-    ble_gatts_char_handles_t    uva_char_handles;
-    ble_gatts_char_handles_t    uvb_char_handles;
-    ble_gatts_char_handles_t    uvd_char_handles;
-    ble_gatts_char_handles_t    uvcomp1_char_handles;
-    ble_gatts_char_handles_t    uvcomp2_char_handles;
-
 }ble_os_t;
 
 /**@brief Function for handling BLE Stack events related to our service and characteristic.
@@ -57,23 +51,7 @@ void ble_our_service_on_ble_evt(ble_os_t * p_our_service, ble_evt_t * p_ble_evt)
  */
 void our_service_init(ble_os_t * p_our_service, ble_uuid_t * service_uuid);
 
-/**@brief Function for updating Battery Level characteristic values
- *
- * @details The application calls this function whenever our timer_timeout_handler triggers
- *
- * @param[in]   p_our_service                     Our Service structure.
- * @param[in]   characteristic_value     New characteristic value.
- */
-//void battery_level_update(ble_os_t *p_our_service, uint16_t *uvindex_value, ble_bas_t * m_bas);
 
-/**@brief Function for updating and sending RGB LED characteristic values
- *
- * @details The application calls this function whenever our timer_timeout_handler triggers
- *
- * @param[in]   p_our_service                     Our Service structure.
- * @param[in]   characteristic_value     New characteristic value.
- */
-uint32_t rgbled_update(ble_os_t *p_our_service);
 
 
 

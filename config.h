@@ -12,8 +12,8 @@
 
 #define NUM_LEDS			12		// Total number of LEDs on the strip
 #define MAX_BRIGHTNESS		255		// Maximum value of a single color (255 for WS2812B/WS2813)
-#define MAX_TOTAL_CURRENT	800 	// Maximum total current (mA) cunsumption allowed for all LEDs
-#define DEMO_PERIOD 		10000	// How long each complete rainbow demo last
+#define MAX_TOTAL_CURRENT	1500 	// Maximum total current (mA) cunsumption allowed for all LEDs
+#define DEMO_PERIOD 		5000	// How long each complete rainbow demo last
 #define CYCLE_TIME 			20		// Period between each color update
 
 /* BLE thingies */
@@ -41,7 +41,7 @@
 #define APP_TIMER_MAX_TIMERS            6                                           /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE         4                                           /**< Size of timer operation queues. */
 
-#define UVINDEX_LEVEL_MEAS_INTERVAL     APP_TIMER_TICKS(2000, APP_TIMER_PRESCALER)  /**< UV Index level measurement interval (ticks). */
+#define LED_REFRESH_INTERVAL		    APP_TIMER_TICKS(2000, APP_TIMER_PRESCALER)  /**< LED refresh interval (ticks). */
 #define ADV_LED_INTERVAL				APP_TIMER_TICKS(500, APP_TIMER_PRESCALER)	/**< Advertisement LED flash rate */
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)            /**< Minimum acceptable connection interval (0.5 seconds). */
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(200, UNIT_1_25_MS)            /**< Maximum acceptable connection interval (1 second). */
