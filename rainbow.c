@@ -7,6 +7,8 @@
  */
 
 #include	"rainbow.h"
+#include "SEGGER_RTT.h"
+#include "SEGGER_RTT_Conf.h"
 
 static rgb_led_t *led_array_base;				// array for base color
 static rgb_led_t *led_array_work; 				// array for flash left-up to right-down
@@ -85,4 +87,40 @@ void rainbow(rgb_led_t * led_array_out)
 			led_array_base[i]=led_array_work[i];
 		}	
 	}
+}
+
+void setcolor(rgb_led_t * led_array_out, uint32_t rgbcolor)
+{
+
+	uint8_t rgbc8[4];
+
+	rgbc8[0] = (uint8_t)(rgbcolor & 0x000000FF);
+	rgbc8[1] = (uint8_t)((rgbcolor & 0x0000FF00)>>8);
+	rgbc8[2] = (uint8_t)((rgbcolor & 0x00FF0000)>>16);
+	rgbc8[3] = (uint8_t)((rgbcolor & 0xFF000000)>>24);
+
+/*
+    char sv[128];
+    sprintf(sv, "setcolor: RGB LED r:%0hx g:%0hx b:%0hx\n", rgbc8[1], rgbc8[2], rgbc8[3]);
+    SEGGER_RTT_WriteString(0, sv);
+*/
+
+	// update led_array_base
+	{
+		for(uint16_t i=0;i<NUM_LEDS;i++)
+		{
+			led_array_work[i].blue  = rgbc8[3];
+			led_array_work[i].green = rgbc8[2];
+			led_array_work[i].red   = rgbc8[1];
+		}
+	}
+	// Update output array
+	{
+		for(uint16_t i=0;i<NUM_LEDS;i++)
+		{
+			led_array_out[i] = led_array_work[i];
+		}	
+	}
+
+
 }

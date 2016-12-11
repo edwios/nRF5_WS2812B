@@ -17,5 +17,6 @@
 void rainbow_init(uint16_t);
 void rainbow_uninit(void);
 void rainbow(rgb_led_t * led_array);
+void setcolor(rgb_led_t * led_array_out, uint32_t rgbcolor);
 
 #endif // RAINBOW_H__

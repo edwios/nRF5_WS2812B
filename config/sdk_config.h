@@ -6,7 +6,339 @@
 #ifdef USE_APP_CONFIG
 #include "app_config.h"
 #endif
+
+
+
+// <e> TIMER_ENABLED - nrf_drv_timer - TIMER periperal driver
+//==========================================================
+#ifndef TIMER_ENABLED
+#define TIMER_ENABLED 1
+#endif
+#if  TIMER_ENABLED
+// <o> TIMER_DEFAULT_CONFIG_FREQUENCY  - Timer frequency if in Timer mode
+ 
+// <0=> 16 MHz 
+// <1=> 8 MHz 
+// <2=> 4 MHz 
+// <3=> 2 MHz 
+// <4=> 1 MHz 
+// <5=> 500 kHz 
+// <6=> 250 kHz 
+// <7=> 125 kHz 
+// <8=> 62.5 kHz 
+// <9=> 31.25 kHz 
+
+#ifndef TIMER_DEFAULT_CONFIG_FREQUENCY
+#define TIMER_DEFAULT_CONFIG_FREQUENCY 9
+#endif
+
+// <o> TIMER_DEFAULT_CONFIG_MODE  - Timer mode or operation
+ 
+// <0=> Timer 
+// <1=> Counter 
+
+#ifndef TIMER_DEFAULT_CONFIG_MODE
+#define TIMER_DEFAULT_CONFIG_MODE 0
+#endif
+
+// <o> TIMER_DEFAULT_CONFIG_BIT_WIDTH  - Timer counter bit width
+ 
+// <0=> 16 bit 
+// <1=> 8 bit 
+// <2=> 24 bit 
+// <3=> 32 bit 
+
+#ifndef TIMER_DEFAULT_CONFIG_BIT_WIDTH
+#define TIMER_DEFAULT_CONFIG_BIT_WIDTH 0
+#endif
+
+// <o> TIMER_DEFAULT_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef TIMER_DEFAULT_CONFIG_IRQ_PRIORITY
+#define TIMER_DEFAULT_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// <q> TIMER0_ENABLED  - Enable TIMER0 instance
+ 
+
+#ifndef TIMER0_ENABLED
+#define TIMER0_ENABLED 0
+#endif
+
+// <q> TIMER1_ENABLED  - Enable TIMER1 instance
+ 
+
+#ifndef TIMER1_ENABLED
+#define TIMER1_ENABLED 0
+#endif
+
+// <q> TIMER2_ENABLED  - Enable TIMER2 instance
+ 
+
+#ifndef TIMER2_ENABLED
+#define TIMER2_ENABLED 1
+#endif
+
+// <q> TIMER3_ENABLED  - Enable TIMER3 instance
+ 
+
+#ifndef TIMER3_ENABLED
+#define TIMER3_ENABLED 0
+#endif
+
+// <q> TIMER4_ENABLED  - Enable TIMER4 instance
+ 
+
+#ifndef TIMER4_ENABLED
+#define TIMER4_ENABLED 0
+#endif
+
+#endif //TIMER_ENABLED
+// </e>
+
+// <h> nRF_BLE 
+
+//==========================================================
+// <q> BLE_ADVERTISING_ENABLED  - ble_advertising - Advertising module
+ 
+
+#ifndef BLE_ADVERTISING_ENABLED
+#define BLE_ADVERTISING_ENABLED 1
+#endif
+
+// <q> BLE_DTM_ENABLED  - ble_dtm - Module for testing RF/PHY using DTM commands
+ 
+
+#ifndef BLE_DTM_ENABLED
+#define BLE_DTM_ENABLED 0
+#endif
+
+// <q> BLE_RACP_ENABLED  - ble_racp - Record Access Control Point library
+ 
+
+#ifndef BLE_RACP_ENABLED
+#define BLE_RACP_ENABLED 0
+#endif
+
+// <q> NRF_BLE_QWR_ENABLED  - nrf_ble_qwr - Queued writes support module (prepare/execute write)
+ 
+
+#ifndef NRF_BLE_QWR_ENABLED
+#define NRF_BLE_QWR_ENABLED 0
+#endif
+
+// <q> PEER_MANAGER_ENABLED  - peer_manager - Peer Manager
+ 
+
+#ifndef PEER_MANAGER_ENABLED
+#define PEER_MANAGER_ENABLED 1
+#endif
+
+// </h> 
+//==========================================================
+
+// <h> nRF_BLE_Services 
+
+//==========================================================
+// <q> BLE_ANCS_C_ENABLED  - ble_ancs_c - Apple Notification Service Client
+ 
+
+#ifndef BLE_ANCS_C_ENABLED
+#define BLE_ANCS_C_ENABLED 0
+#endif
+
+// <q> BLE_ANS_C_ENABLED  - ble_ans_c - Alert Notification Service Client
+ 
+
+#ifndef BLE_ANS_C_ENABLED
+#define BLE_ANS_C_ENABLED 0
+#endif
+
+// <q> BLE_BAS_C_ENABLED  - ble_bas_c - Battery Service Client
+ 
+
+#ifndef BLE_BAS_C_ENABLED
+#define BLE_BAS_C_ENABLED 0
+#endif
+
+// <q> BLE_BAS_ENABLED  - ble_bas - Battery Service
+ 
+
+#ifndef BLE_BAS_ENABLED
+#define BLE_BAS_ENABLED 0
+#endif
+
+// <q> BLE_CSCS_ENABLED  - ble_cscs - Cycling Speed and Cadence Service
+ 
+
+#ifndef BLE_CSCS_ENABLED
+#define BLE_CSCS_ENABLED 0
+#endif
+
+// <q> BLE_CTS_C_ENABLED  - ble_cts_c - Current Time Service Client
+ 
+
+#ifndef BLE_CTS_C_ENABLED
+#define BLE_CTS_C_ENABLED 0
+#endif
+
+// <q> BLE_DIS_ENABLED  - ble_dis - Device Information Service
+ 
+
+#ifndef BLE_DIS_ENABLED
+#define BLE_DIS_ENABLED 1
+#endif
+
+// <q> BLE_GLS_ENABLED  - ble_gls - Glucose Service
+ 
+
+#ifndef BLE_GLS_ENABLED
+#define BLE_GLS_ENABLED 0
+#endif
+
+// <q> BLE_HIDS_ENABLED  - ble_hids - Human Interface Device Service
+ 
+
+#ifndef BLE_HIDS_ENABLED
+#define BLE_HIDS_ENABLED 0
+#endif
+
+// <q> BLE_HRS_C_ENABLED  - ble_hrs_c - Heart Rate Service Client
+ 
+
+#ifndef BLE_HRS_C_ENABLED
+#define BLE_HRS_C_ENABLED 0
+#endif
+
+// <q> BLE_HRS_ENABLED  - ble_hrs - Heart Rate Service
+ 
+
+#ifndef BLE_HRS_ENABLED
+#define BLE_HRS_ENABLED 0
+#endif
+
+// <q> BLE_HTS_ENABLED  - ble_hts - Health Thermometer Service
+ 
+
+#ifndef BLE_HTS_ENABLED
+#define BLE_HTS_ENABLED 0
+#endif
+
+// <q> BLE_IAS_C_ENABLED  - ble_ias_c - Immediate Alert Service Client
+ 
+
+#ifndef BLE_IAS_C_ENABLED
+#define BLE_IAS_C_ENABLED 0
+#endif
+
+// <q> BLE_IAS_ENABLED  - ble_ias - Immediate Alert Service
+ 
+
+#ifndef BLE_IAS_ENABLED
+#define BLE_IAS_ENABLED 0
+#endif
+
+// <q> BLE_LBS_C_ENABLED  - ble_lbs_c - Nordic LED Button Service Client
+ 
+
+#ifndef BLE_LBS_C_ENABLED
+#define BLE_LBS_C_ENABLED 0
+#endif
+
+// <q> BLE_LBS_ENABLED  - ble_lbs - LED Button Service
+ 
+
+#ifndef BLE_LBS_ENABLED
+#define BLE_LBS_ENABLED 0
+#endif
+
+// <q> BLE_LLS_ENABLED  - ble_lls - Link Loss Service
+ 
+
+#ifndef BLE_LLS_ENABLED
+#define BLE_LLS_ENABLED 0
+#endif
+
+// <q> BLE_NUS_C_ENABLED  - ble_nus_c - Nordic UART Central Service
+ 
+
+#ifndef BLE_NUS_C_ENABLED
+#define BLE_NUS_C_ENABLED 0
+#endif
+
+// <q> BLE_NUS_ENABLED  - ble_nus - Nordic UART Service
+ 
+
+#ifndef BLE_NUS_ENABLED
+#define BLE_NUS_ENABLED 0
+#endif
+
+// <q> BLE_RSCS_C_ENABLED  - ble_rscs_c - Running Speed and Cadence Client
+ 
+
+#ifndef BLE_RSCS_C_ENABLED
+#define BLE_RSCS_C_ENABLED 0
+#endif
+
+// <q> BLE_RSCS_ENABLED  - ble_rscs - Running Speed and Cadence Service
+ 
+
+#ifndef BLE_RSCS_ENABLED
+#define BLE_RSCS_ENABLED 0
+#endif
+
+// <q> BLE_TPS_ENABLED  - ble_tps - TX Power Service
+ 
+
+#ifndef BLE_TPS_ENABLED
+#define BLE_TPS_ENABLED 0
+#endif
+
+// </h> 
 // <h> Application 
+
+
+// <e> GPIOTE_ENABLED - nrf_drv_gpiote - GPIOTE peripheral driver
+//==========================================================
+#ifndef GPIOTE_ENABLED
+#define GPIOTE_ENABLED 1
+#endif
+#if  GPIOTE_ENABLED
+// <o> GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS - Number of lower power input pins 
+#ifndef GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS
+#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 4
+#endif
+
+// <o> GPIOTE_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef GPIOTE_CONFIG_IRQ_PRIORITY
+#define GPIOTE_CONFIG_IRQ_PRIORITY 6
+#endif
+
+#endif //GPIOTE_ENABLED
+// </e>
 
 //==========================================================
 // <o> I2S_SDIN_PIN - Pin number  <0-31> 
@@ -479,8 +811,266 @@
 // </h> 
 //==========================================================
 
-// </h> 
+// <h> nRF_Libraries 
+
 //==========================================================
+// <q> APP_FIFO_ENABLED  - app_fifo - Software FIFO implementation
+ 
+
+#ifndef APP_FIFO_ENABLED
+#define APP_FIFO_ENABLED 1
+#endif
+
+// <q> APP_MAILBOX_ENABLED  - app_mailbox - Thread safe mailbox
+ 
+
+#ifndef APP_MAILBOX_ENABLED
+#define APP_MAILBOX_ENABLED 0
+#endif
+
+// <q> APP_PWM_ENABLED  - app_pwm - PWM functionality
+ 
+
+#ifndef APP_PWM_ENABLED
+#define APP_PWM_ENABLED 0
+#endif
+
+// <e> APP_SCHEDULER_ENABLED - app_scheduler - Events scheduler
+//==========================================================
+#ifndef APP_SCHEDULER_ENABLED
+#define APP_SCHEDULER_ENABLED 0
+#endif
+#if  APP_SCHEDULER_ENABLED
+// <q> APP_SCHEDULER_WITH_PAUSE  - Enabling pause feature
+ 
+
+#ifndef APP_SCHEDULER_WITH_PAUSE
+#define APP_SCHEDULER_WITH_PAUSE 0
+#endif
+
+// <q> APP_SCHEDULER_WITH_PROFILER  - Enabling scheduler profiling
+ 
+
+#ifndef APP_SCHEDULER_WITH_PROFILER
+#define APP_SCHEDULER_WITH_PROFILER 0
+#endif
+
+#endif //APP_SCHEDULER_ENABLED
+// </e>
+
+// <e> APP_TIMER_ENABLED - app_timer - Application timer functionality
+//==========================================================
+#ifndef APP_TIMER_ENABLED
+#define APP_TIMER_ENABLED 1
+#endif
+#if  APP_TIMER_ENABLED
+// <q> APP_TIMER_WITH_PROFILER  - Enable app_timer profiling
+ 
+
+#ifndef APP_TIMER_WITH_PROFILER
+#define APP_TIMER_WITH_PROFILER 0
+#endif
+
+// <q> APP_TIMER_KEEPS_RTC_ACTIVE  - Enable RTC always on
+ 
+
+// <i> If option is enabled RTC is kept running even if there is no active timers.
+// <i> This option can be used when app_timer is used for timestamping.
+
+#ifndef APP_TIMER_KEEPS_RTC_ACTIVE
+#define APP_TIMER_KEEPS_RTC_ACTIVE 0
+#endif
+
+#endif //APP_TIMER_ENABLED
+// </e>
+
+// <q> APP_TWI_ENABLED  - app_twi - TWI transaction manager
+ 
+
+#ifndef APP_TWI_ENABLED
+#define APP_TWI_ENABLED 0
+#endif
+
+// <e> APP_UART_ENABLED - app_uart - UART driver
+//==========================================================
+#ifndef APP_UART_ENABLED
+#define APP_UART_ENABLED 0
+#endif
+#if  APP_UART_ENABLED
+// <o> APP_UART_DRIVER_INSTANCE  - UART instance used
+ 
+// <0=> 0 
+
+#ifndef APP_UART_DRIVER_INSTANCE
+#define APP_UART_DRIVER_INSTANCE 0
+#endif
+
+#endif //APP_UART_ENABLED
+// </e>
+
+// <q> BUTTON_ENABLED  - app_button - buttons handling module
+ 
+
+#ifndef BUTTON_ENABLED
+#define BUTTON_ENABLED 1
+#endif
+
+// <q> CRC16_ENABLED  - crc16 - CRC16 calculation routines
+ 
+
+#ifndef CRC16_ENABLED
+#define CRC16_ENABLED 0
+#endif
+
+// <q> CRC32_ENABLED  - crc32 - CRC32 calculation routines
+ 
+
+#ifndef CRC32_ENABLED
+#define CRC32_ENABLED 0
+#endif
+
+// <q> ECC_ENABLED  - ecc - Elliptic Curve Cryptography Library
+ 
+
+#ifndef ECC_ENABLED
+#define ECC_ENABLED 0
+#endif
+
+
+// <e> CLOCK_ENABLED - nrf_drv_clock - CLOCK peripheral driver
+//==========================================================
+#ifndef CLOCK_ENABLED
+#define CLOCK_ENABLED 1
+#endif
+#if  CLOCK_ENABLED
+// <o> CLOCK_CONFIG_XTAL_FREQ  - HF XTAL Frequency
+ 
+// <0=> Default (64 MHz) 
+
+#ifndef CLOCK_CONFIG_XTAL_FREQ
+#define CLOCK_CONFIG_XTAL_FREQ 0
+#endif
+
+// <o> CLOCK_CONFIG_LF_SRC  - LF Clock Source
+ 
+// <0=> RC 
+// <1=> XTAL 
+// <2=> Synth 
+
+#ifndef CLOCK_CONFIG_LF_SRC
+#define CLOCK_CONFIG_LF_SRC 1
+#endif
+
+// <o> CLOCK_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef CLOCK_CONFIG_IRQ_PRIORITY
+#define CLOCK_CONFIG_IRQ_PRIORITY 6
+#endif
+
+#endif //CLOCK_ENABLED
+// </e>
+
+// <e> FDS_ENABLED - fds - Flash data storage module
+//==========================================================
+#ifndef FDS_ENABLED
+#define FDS_ENABLED 1
+#endif
+#if  FDS_ENABLED
+// <o> FDS_OP_QUEUE_SIZE - Size of the internal queue. 
+#ifndef FDS_OP_QUEUE_SIZE
+#define FDS_OP_QUEUE_SIZE 4
+#endif
+
+// <o> FDS_CHUNK_QUEUE_SIZE - Determines how many @ref fds_record_chunk_t structures can be buffered at any time. 
+#ifndef FDS_CHUNK_QUEUE_SIZE
+#define FDS_CHUNK_QUEUE_SIZE 8
+#endif
+
+// <o> FDS_MAX_USERS - Maximum number of callbacks that can be registered. 
+#ifndef FDS_MAX_USERS
+#define FDS_MAX_USERS 8
+#endif
+
+// <o> FDS_VIRTUAL_PAGES - Number of virtual flash pages to use. 
+// <i> One of the virtual pages is reserved by the system for garbage collection.
+// <i> Therefore, the minimum is two virtual pages: one page to store data and
+// <i> one page to be used by the system for garbage collection. The total amount
+// <i> of flash memory that is used by FDS amounts to @ref FDS_VIRTUAL_PAGES
+// <i> @ref FDS_VIRTUAL_PAGE_SIZE * 4 bytes.
+
+#ifndef FDS_VIRTUAL_PAGES
+#define FDS_VIRTUAL_PAGES 3
+#endif
+
+// <o> FDS_VIRTUAL_PAGE_SIZE  - The size of a virtual page of flash memory, expressed in number of 4-byte words.
+ 
+
+// <i> By default, a virtual page is the same size as a physical page.
+// <i> The size of a virtual page must be a multiple of the size of a physical page.
+// <1024=> 1024 
+// <2048=> 2048 
+
+#ifndef FDS_VIRTUAL_PAGE_SIZE
+#define FDS_VIRTUAL_PAGE_SIZE 1024
+#endif
+
+#endif //FDS_ENABLED
+// </e>
+
+// <e> FSTORAGE_ENABLED - fstorage - Flash storage module
+//==========================================================
+#ifndef FSTORAGE_ENABLED
+#define FSTORAGE_ENABLED 1
+#endif
+#if  FSTORAGE_ENABLED
+// <o> FS_QUEUE_SIZE - Configures the size of the internal queue. 
+// <i> Increase this if there are many users, or if it is likely that many
+// <i> operation will be queued at once without waiting for the previous operations
+// <i> to complete. In general, increase the queue size if you frequently receive
+// <i> @ref FS_ERR_QUEUE_FULL errors when calling @ref fs_store or @ref fs_erase.
+
+#ifndef FS_QUEUE_SIZE
+#define FS_QUEUE_SIZE 4
+#endif
+
+// <o> FS_OP_MAX_RETRIES - Number attempts to execute an operation if the SoftDevice fails. 
+// <i> Increase this value if events return the @ref FS_ERR_OPERATION_TIMEOUT
+// <i> error often. The SoftDevice may fail to schedule flash access due to high BLE activity.
+
+#ifndef FS_OP_MAX_RETRIES
+#define FS_OP_MAX_RETRIES 3
+#endif
+
+// <o> FS_MAX_WRITE_SIZE_WORDS - Maximum number of words to be written to flash in a single operation. 
+// <i> Tweaking this value can increase the chances of the SoftDevice being
+// <i> able to fit flash operations in between radio activity. This value is bound by the
+// <i> maximum number of words which the SoftDevice can write to flash in a single call to
+// <i> @ref sd_flash_write, which is 256 words for nRF51 ICs and 1024 words for nRF52 ICs.
+
+#ifndef FS_MAX_WRITE_SIZE_WORDS
+#define FS_MAX_WRITE_SIZE_WORDS 1024
+#endif
+
+#endif //FSTORAGE_ENABLED
+// </e>
+
+// <q> HARDFAULT_HANDLER_ENABLED  - hardfault_default - HardFault default handler for debugging and release
+ 
+
+#ifndef HARDFAULT_HANDLER_ENABLED
+#define HARDFAULT_HANDLER_ENABLED 0
+#endif
 
 // <<< end of configuration section >>>
 #endif //SDK_CONFIG_H

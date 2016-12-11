@@ -86,7 +86,7 @@ ret_code_t i2s_ws2812b_drive_xfer(rgb_led_t *led_array, uint16_t num_leds, uint8
 	config.alignment    = NRF_I2S_ALIGN_LEFT;
 	config.sample_width = NRF_I2S_SWIDTH_16BIT;
 	config.channels     = NRF_I2S_CHANNELS_STEREO;
-	config.mck_setup 		= NRF_I2S_MCK_32MDIV10;
+	config.mck_setup 		= NRF_I2S_MCK_32MDIV16;
 	config.ratio     		= NRF_I2S_RATIO_32X;
 	
 	// initialize i2s
