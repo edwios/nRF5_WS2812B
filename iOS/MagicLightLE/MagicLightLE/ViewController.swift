@@ -53,7 +53,7 @@ extension ViewController: HSBColorPickerDelegate {
                 lastTouchTime = Date()
                 // Handle color touched only per 1.2 seconds
                 var dataArray = [UInt8](repeating: 0, count: 4)
-                apple_rgbcolor = color
+                self.apple_rgbcolor = color
                 let rgb = color.rgb()
                 dataArray[0] = UInt8((rgb! & 0xFF000000) >> 24)
                 dataArray[1] = UInt8((rgb! & 0x00FF0000) >> 16)
@@ -111,8 +111,10 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        lastColor = defaultInitialColor
-        apple_rgbcolor = UIColor(red:0.0, green:0.0, blue:0.0, alpha:1.0)
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.viewController = self
+        self.lastColor = defaultInitialColor
+        self.apple_rgbcolor = UIColor(red:0.0, green:0.0, blue:0.0, alpha:1.0)
         
         // Create our CBCentral Manager
         // delegate: The delegate that will receive central role events. Typically self.
@@ -138,7 +140,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        if lastColor != defaultInitialColor {
+        if self.lastColor != defaultInitialColor {
             updateLEDColorDisplay()
         }
     }
@@ -148,7 +150,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     
     @IBAction func handleDisconnectButtonTapped(_ sender: AnyObject) {
         // if we don't have a sensor tag, start scanning for one...
-        if blePeripheral == nil {
+        if self.blePeripheral == nil {
             keepScanning = true
             resumeScan()
             return
@@ -212,7 +214,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         circleLayer.path = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: circleView.frame.width, height: circleView.frame.height)).cgPath
         circleView.layer.addSublayer(circleLayer)
         circleLayer.lineWidth = 8
-        circleLayer.strokeColor = apple_rgbcolor.cgColor
+        circleLayer.strokeColor = self.apple_rgbcolor.cgColor
         circleLayer.fillColor = UIColor.clear.cgColor
         circleDrawn = true
     }
@@ -258,8 +260,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         let colorBlue:UInt8 = dataArray[3]
         
         let temp = UIColor.init(red: CGFloat(colorRed)/255.0, green: CGFloat(colorGreen)/255.0, blue: CGFloat(colorBlue)/255.0, alpha:1.0)
-        lastColor = temp
-        apple_rgbcolor = lastColor
+        self.lastColor = temp
+        self.apple_rgbcolor = lastColor
         if (debug) {print("DEBUG: LAST Color CAPTURED: \(lastColor)")}
         
         if UIApplication.shared.applicationState == .active {
@@ -344,11 +346,11 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
                 disconnectButton.isEnabled = true
                 
                 // save a reference to the sensor tag
-                blePeripheral = peripheral
-                blePeripheral!.delegate = self
+                self.blePeripheral = peripheral
+                self.blePeripheral!.delegate = self
                 
                 // Request a connection to the peripheral
-                centralManager.connect(blePeripheral!, options: nil)
+                centralManager.connect(self.blePeripheral!, options: nil)
             }
         }
     }
@@ -405,7 +407,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         if error != nil {
             if (debug) {print("ERROR: DISCONNECTION DETAILS: \(error!.localizedDescription)")}
         }
-        blePeripheral = nil
+        self.blePeripheral = nil
         // Todo
         // Save lastColor to defaults for next time to set the LED color automatically
     }
