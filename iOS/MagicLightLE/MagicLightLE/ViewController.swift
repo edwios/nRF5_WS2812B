@@ -49,12 +49,11 @@ extension ViewController: HSBColorPickerDelegate {
     func HSBColorColorPickerTouched(sender:HSBColorPicker, color:UIColor,    point:CGPoint, state:UIGestureRecognizerState) {
         if (LEDConnected) { // Act only when connected
 //            if (CFDateGetTimeIntervalSinceDate(Date() as CFDate!, lastTouchTime as CFDate!) > 1.5) {
-            if (abs(lastTouchTime.timeIntervalSince(Date())) > 1.5) {
+            if (abs(lastTouchTime.timeIntervalSince(Date())) > 0.5) {
                 lastTouchTime = Date()
                 // Handle color touched only per 1.2 seconds
                 var dataArray = [UInt8](repeating: 0, count: 4)
                 apple_rgbcolor = color
-                print("*** color touched: \(apple_rgbcolor)");
                 let rgb = color.rgb()
                 dataArray[0] = UInt8((rgb! & 0xFF000000) >> 24)
                 dataArray[1] = UInt8((rgb! & 0x00FF0000) >> 16)
@@ -71,13 +70,14 @@ extension ViewController: HSBColorPickerDelegate {
 // Conform to CBCentralManagerDelegate, CBPeripheralDelegate protocols
 class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDelegate {
     
-    @IBOutlet weak var backgroundImageView1: UIImageView!
+    @IBOutlet weak var backgroundImageView: UIImageView!
     @IBOutlet weak var controlContainerView: UIView!
     @IBOutlet weak var circleView: UIView!
     @IBOutlet weak var messageLabel: UILabel!
     @IBOutlet weak var disconnectButton: UIButton!
     @IBOutlet weak var colorPickerView: UIView!
     
+    let debug = false
     // define our scanning interval times
     let timerPauseInterval:TimeInterval = 10.0
     let timerScanInterval:TimeInterval = 2.0
@@ -87,19 +87,16 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     let messageLabelFontSizeMessage:CGFloat = 56.0
     let messageLabelFontSizeTemp:CGFloat = 40.0
     
-    var backgroundImageViews: [UIImageView]!
     var visibleBackgroundIndex = 0
     var invisibleBackgroundIndex = 1
-//    var lastColorTens = 0
     let defaultInitialColor = UIColor(red:0.0, green:0.0, blue:0.0, alpha:1.0)
     var lastColor=UIColor(red:0.0, green:0.0, blue:0.0, alpha:1.0)
     var circleDrawn = false
     var keepScanning = false
-    //var isScanning = false
     
     // Core Bluetooth properties
     var centralManager:CBCentralManager!
-    var sensorTag:CBPeripheral?
+    var blePeripheral:CBPeripheral?
     var ledcolorCharacteristic:CBCharacteristic?
     var ledcolorPeripheral:CBPeripheral?
     var ledcolorDescriptor:CBDescriptor?
@@ -108,10 +105,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     var lastTouchTime = Date()
     var apple_rgbcolor=UIColor(red:0.0, green:0.0, blue:0.0, alpha:1.0)
     
-    // This could be simplified to "SensorTag" and check if it's a substring.
-    // (Probably a good idea to do that if you're using a different model of
-    // the SensorTag, or if you don't know what model it is...)
-    let sensorTagName = "MagicLi"
+    // Be careful, the advertised name may be the Short name.
+    let blePeripheralName = "MagicLi"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -137,9 +132,8 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         messageLabel.font = UIFont(name: messageLabelFontName, size: messageLabelFontSizeMessage)
         messageLabel.text = "Searching"
         circleView.isHidden = true
-        backgroundImageViews = [backgroundImageView1]
-        view.bringSubview(toFront: backgroundImageViews[0])
-        backgroundImageViews[0].alpha = 1
+        view.bringSubview(toFront: backgroundImageView)
+        backgroundImageView.alpha = 1
         view.bringSubview(toFront: controlContainerView)
     }
     
@@ -154,7 +148,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     
     @IBAction func handleDisconnectButtonTapped(_ sender: AnyObject) {
         // if we don't have a sensor tag, start scanning for one...
-        if sensorTag == nil {
+        if blePeripheral == nil {
             keepScanning = true
             resumeScan()
             return
@@ -164,24 +158,11 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     }
     
     func disconnect() {
-        if let sensorTag = self.sensorTag {
-//            if let tc = self.ledcolorCharacteristic {
-//                sensorTag.setNotifyValue(false, for: tc)
-//            }
+        if let blePeripheral = self.blePeripheral {
             LEDConnected = false
             ledcolorCharacteristic = nil
             ledcolorPeripheral = nil
-            
-            /*
-             NOTE: The cancelPeripheralConnection: method is nonblocking, and any CBPeripheral class commands
-             that are still pending to the peripheral you’re trying to disconnect may or may not finish executing.
-             Because other apps may still have a connection to the peripheral, canceling a local connection
-             does not guarantee that the underlying physical link is immediately disconnected.
-             
-             From your app’s perspective, however, the peripheral is considered disconnected, and the central manager
-             object calls the centralManager:didDisconnectPeripheral:error: method of its delegate object.
-             */
-            centralManager.cancelPeripheralConnection(sensorTag)
+            centralManager.cancelPeripheralConnection(blePeripheral)
         }
     }
     
@@ -190,7 +171,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     
     func pauseScan() {
         // Scanning uses up battery on phone, so pause the scan process for the designated interval.
-        print("*** PAUSING SCAN...")
+        if (debug) {print("DEBUG: PAUSING SCAN...")}
         _ = Timer(timeInterval: timerPauseInterval, target: self, selector: #selector(resumeScan), userInfo: nil, repeats: false)
         centralManager.stopScan()
         disconnectButton.isEnabled = true
@@ -199,7 +180,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     func resumeScan() {
         if keepScanning {
             // Start scanning again...
-            print("*** RESUMING SCAN!")
+            if (debug) {print("DEBUG: RESUMING SCAN!")}
             disconnectButton.isEnabled = false
             messageLabel.font = UIFont(name: messageLabelFontName, size: messageLabelFontSizeMessage)
             messageLabel.text = "Searching"
@@ -258,34 +239,6 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         }
         return temperatureTens
     }
-
-    /*
-    func updateBackgroundImageForTemperature(_ temperature:Int) {
-        let temperatureTens = tensValue(temperature)
-        if temperatureTens != lastColorTens {
-            // generate file name of new background to show
-            let temperatureFilename = "temp-\(temperatureTens)"
-            print("*** BACKGROUND FILENAME: \(temperatureFilename)")
-            
-            // fade out old background, fade in new.
-            let visibleBackground = backgroundImageViews[visibleBackgroundIndex]
-            let invisibleBackground = backgroundImageViews[invisibleBackgroundIndex]
-            invisibleBackground.image = UIImage(named: temperatureFilename)
-            invisibleBackground.alpha = 0
-            view.bringSubview(toFront: invisibleBackground)
-            view.bringSubview(toFront: controlContainerView)
-            UIView.animate(withDuration: 0.5, animations: {
-                invisibleBackground.alpha = 1;
-            }, completion: { (finished) in
-                visibleBackground.alpha = 0
-                let indexTemp = self.visibleBackgroundIndex
-                self.visibleBackgroundIndex = self.invisibleBackgroundIndex
-                self.invisibleBackgroundIndex = indexTemp
-                print("**** NEW INDICES - visible: \(self.visibleBackgroundIndex) - invisible: \(self.invisibleBackgroundIndex)")
-            })
-        }
-    }
-    */
     
     func displayColor(_ data:Data) {
         // We'll get four bytes of data back, so we divide the byte count by one
@@ -293,13 +246,13 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         let dataLength = data.count / MemoryLayout<UInt8>.size
         var dataArray = [UInt8](repeating: 0, count: dataLength)
         (data as NSData).getBytes(&dataArray, length: dataLength * MemoryLayout<Int8>.size)
-        
-        //        // output values for debugging/diagnostic purposes
-                for i in 0 ..< dataLength {
-                    let nextInt:UInt8 = dataArray[i]
-                    print("next byte: \(nextInt)")
-                }
-        
+        if (debug) {
+            // output values for debugging/diagnostic purposes
+            for i in 0 ..< dataLength {
+                let nextInt:UInt8 = dataArray[i]
+                print("next byte: \(nextInt)")
+            }
+        }
         let colorRed:UInt8 = dataArray[1]
         let colorGreen:UInt8 = dataArray[2]
         let colorBlue:UInt8 = dataArray[3]
@@ -307,37 +260,12 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         let temp = UIColor.init(red: CGFloat(colorRed)/255.0, green: CGFloat(colorGreen)/255.0, blue: CGFloat(colorBlue)/255.0, alpha:1.0)
         lastColor = temp
         apple_rgbcolor = lastColor
-        print("*** LAST Color CAPTURED: \(lastColor)")
+        if (debug) {print("DEBUG: LAST Color CAPTURED: \(lastColor)")}
         
         if UIApplication.shared.applicationState == .active {
             updateLEDColorDisplay()
         }
     }
-
-    /*
-    func displayHumidity(_ data:Data) {
-        let dataLength = data.count / MemoryLayout<UInt16>.size
-        var dataArray = [UInt16](repeating: 0, count: dataLength)
-        (data as NSData).getBytes(&dataArray, length: dataLength * MemoryLayout<Int16>.size)
-        
-        for i in 0 ..< dataLength {
-            let nextInt:UInt16 = dataArray[i]
-            print("next int: \(nextInt)")
-        }
-        
-        let rawHumidity:UInt16 = dataArray[Device.SensorDataIndexHumidity]
-        let calculatedHumidity = calculateRelativeHumidity(rawHumidity)
-        print("*** HUMIDITY: \(calculatedHumidity)");
-        
-        // Humidity sensor also retrieves a temperature, which we don't use.
-        // However, for instructional purposes, here's how to get at it to compare to the ambient sensor:
-        let rawHumidityTemp:UInt16 = dataArray[Device.SensorDataIndexHumidityTemp]
-        let calculatedTemperatureC = calculateHumidityTemperature(rawHumidityTemp)
-        let calculatedTemperatureF = convertCelciusToFahrenheit(calculatedTemperatureC)
-        print("*** HUMIDITY TEMP C: \(calculatedTemperatureC) F: \(calculatedTemperatureF)")
-        
-    }
-    */
     
     // MARK: - CBCentralManagerDelegate methods
     
@@ -361,18 +289,18 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
             showAlert = false
             message = "Bluetooth LE is turned on and ready for communication."
             
-            print(message)
+            if (debug) {print(message)}
             keepScanning = true
             _ = Timer(timeInterval: timerScanInterval, target: self, selector: #selector(pauseScan), userInfo: nil, repeats: false)
             
             // Initiate Scan for Peripherals
             //Option 1: Scan for all devices
-            centralManager.scanForPeripherals(withServices: nil, options: nil)
+            //centralManager.scanForPeripherals(withServices: nil, options: nil)
             
             // Option 2: Scan for devices that have the service you're interested in...
-            //let sensorTagAdvertisingUUID = CBUUID(string: Device.SensorTagAdvertisingUUID)
-            //print("Scanning for SensorTag adverstising with UUID: \(sensorTagAdvertisingUUID)")
-            //centralManager.scanForPeripheralsWithServices([sensorTagAdvertisingUUID], options: nil)
+            let blePeripheralAdvertisingUUID = CBUUID(string: Device.MagicLightServiceUUID)
+            if (debug) {print("DEBUG: Scanning for blePeripheral adverstising with UUID: \(blePeripheralAdvertisingUUID)")}
+            centralManager.scanForPeripherals(withServices: [blePeripheralAdvertisingUUID], options: nil)
             
         }
         
@@ -401,25 +329,26 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
      
      */
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        //print("centralManager didDiscoverPeripheral - CBAdvertisementDataLocalNameKey is \"\(CBAdvertisementDataLocalNameKey)\"")
+        if (debug) {print("DEBUG: centralManager didDiscoverPeripheral - CBAdvertisementDataLocalNameKey is \"\(CBAdvertisementDataLocalNameKey)\"")}
         
         // Retrieve the peripheral name from the advertisement data using the "kCBAdvDataLocalName" key
         if let peripheralName = advertisementData[CBAdvertisementDataLocalNameKey] as? String {
-            print("NEXT PERIPHERAL NAME: \(peripheralName)")
-            print("NEXT PERIPHERAL UUID: \(peripheral.identifier.uuidString)")
-            
-            if peripheralName == sensorTagName {
-                print("MAGICLIGHT FOUND! ADDING NOW!!!")
+            if (debug) {
+                print("DEBUG: NEXT PERIPHERAL NAME: \(peripheralName)")
+                print("DEBUG: NEXT PERIPHERAL UUID: \(peripheral.identifier.uuidString)")
+            }
+            if peripheralName == blePeripheralName {
+                if (debug) {print("DEBUG: MAGICLIGHT FOUND! ADDING NOW!!!")}
                 // to save power, stop scanning for other devices
                 keepScanning = false
                 disconnectButton.isEnabled = true
                 
                 // save a reference to the sensor tag
-                sensorTag = peripheral
-                sensorTag!.delegate = self
+                blePeripheral = peripheral
+                blePeripheral!.delegate = self
                 
                 // Request a connection to the peripheral
-                centralManager.connect(sensorTag!, options: nil)
+                centralManager.connect(blePeripheral!, options: nil)
             }
         }
     }
@@ -432,16 +361,18 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
      You typically implement this method to set the peripheral’s delegate and to discover its services.
      */
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        print("**** SUCCESSFULLY CONNECTED TO MAGICLIGHT!!!")
+        if (debug) {print("DEBUG: SUCCESSFULLY CONNECTED TO MAGICLIGHT!!!")}
         
         messageLabel.font = UIFont(name: messageLabelFontName, size: messageLabelFontSizeMessage)
         messageLabel.text = "Connected"
         
-        // Now that we've successfully connected to the SensorTag, let's discover the services.
+        // Now that we've successfully connected to the blePeripheral, let's discover the services.
         // - NOTE:  we pass nil here to request ALL services be discovered.
         //          If there was a subset of services we were interested in, we could pass the UUIDs here.
         //          Doing so saves battery life and saves time.
-        peripheral.discoverServices(nil)
+        // peripheral.discoverServices(nil)
+        let blePeripheralServiceUUID = CBUUID(string: Device.MagicLightServiceUUID)
+        peripheral.discoverServices([blePeripheralServiceUUID])
     }
     
     
@@ -453,7 +384,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
      in which case you may attempt to connect to the peripheral again.
      */
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-        print("**** CONNECTION TO MAGICLIGHT FAILED!!!")
+        if (debug) {print("ERROR: CONNECTION TO MAGICLIGHT FAILED!!!")}
     }
     
     
@@ -467,14 +398,14 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
      Note that when a peripheral is disconnected, all of its services, characteristics, and characteristic descriptors are invalidated.
      */
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        print("**** DISCONNECTED FROM MAGICLIGHT!!!")
+        if (debug) {print("DEBUG: DISCONNECTED FROM MAGICLIGHT!!!")}
         circleView.isHidden = true
         messageLabel.font = UIFont(name: messageLabelFontName, size: messageLabelFontSizeMessage)
         messageLabel.text = "Tap to search"
         if error != nil {
-            print("****** DISCONNECTION DETAILS: \(error!.localizedDescription)")
+            if (debug) {print("ERROR: DISCONNECTION DETAILS: \(error!.localizedDescription)")}
         }
-        sensorTag = nil
+        blePeripheral = nil
         // Todo
         // Save lastColor to defaults for next time to set the LED color automatically
     }
@@ -495,18 +426,18 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     // When the specified services are discovered, the peripheral calls the peripheral:didDiscoverServices: method of its delegate object.
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         if error != nil {
-            print("ERROR DISCOVERING SERVICES: \(error?.localizedDescription)")
+            if (debug) {print("ERROR: ERROR IN DISCOVERING SERVICES: \(error?.localizedDescription)")}
             return
         }
         
         // Core Bluetooth creates an array of CBService objects —- one for each service that is discovered on the peripheral.
         if let services = peripheral.services {
             for service in services {
-                print("Discovered service \(service)")
+                if (debug) {print("DEBUG: Discovered service \(service)")}
                 // If we found either the temperature or the humidity service, discover the characteristics for those services.
                 if (service.uuid == CBUUID(string: Device.MagicLightServiceUUID))
                 {
-                    print("Discovering characteristics")
+                    if (debug) {print("DEBUG: Discovering characteristics")}
                     let LEDColorCharUUIDs = [CBUUID(string: Device.LEDColorCharUUID)]
                     peripheral.discoverCharacteristics(LEDColorCharUUIDs, for: service)
                 }
@@ -526,16 +457,16 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
      */
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         if error != nil {
-            print("ERROR DISCOVERING CHARACTERISTICS: \(error?.localizedDescription)")
+            if (debug) {print("ERROR: ERROR IN DISCOVERING CHARACTERISTICS: \(error?.localizedDescription)")}
             return
         }
         
         if let characteristics = service.characteristics {
             
             for characteristic in characteristics {
-                print("Discovered characteristics \(characteristics)")
+                if (debug) {print("DEBUG: Discovered characteristics \(characteristics)")}
                 if characteristic.uuid == CBUUID(string: Device.LEDColorCharUUID) {
-                    print("Discovered charecteristic \(characteristics)")
+                    if (debug) {print("DEBUG: Discovered charecteristic \(characteristics)")}
                     ledcolorCharacteristic = characteristic
                     ledcolorPeripheral = peripheral
                     ledcolorDescriptor = characteristic.descriptors?[0]
@@ -560,10 +491,10 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
      */
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         if error != nil {
-            print("ERROR ON UPDATING VALUE FOR CHARACTERISTIC: \(characteristic) - \(error?.localizedDescription)")
+            if (debug) {print("ERROR: UPDATING VALUE FOR CHARACTERISTIC: \(characteristic) - \(error?.localizedDescription)")}
             return
         }
-        print("Characteristic \(characteristic) updated value")
+        if (debug) {print("DEBUG: Characteristic \(characteristic) updated value")}
         // extract the data from the characteristic's value property and display the value based on the characteristic type
         if let dataBytes = characteristic.value {
             if characteristic.uuid == CBUUID(string: Device.LEDColorCharUUID) {
@@ -575,7 +506,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         if error != nil {
-            print("ERROR ON UPDATING VALUE TO CHARACTERISTIC: \(characteristic) - \(error?.localizedDescription)")
+            if (debug) {print("ERROR: UPDATING VALUE TO CHARACTERISTIC: \(characteristic) - \(error?.localizedDescription)")}
             return
         }
         circleDrawn = false

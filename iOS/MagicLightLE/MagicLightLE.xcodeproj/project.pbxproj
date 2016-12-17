@@ -58,14 +58,14 @@
 		AE15EDE01DFEDE6F007C97BB /* MagicLightLE */ = {
 			isa = PBXGroup;
 			children = (
+				AE15EDF31DFEDF78007C97BB /* Device.swift */,
 				AE15EDE11DFEDE6F007C97BB /* AppDelegate.swift */,
 				AE15EDE31DFEDE6F007C97BB /* ViewController.swift */,
+				AE15EDF51DFEF440007C97BB /* HSBColorPicker.swift */,
 				AE15EDE51DFEDE6F007C97BB /* Main.storyboard */,
-				AE15EDE81DFEDE6F007C97BB /* Assets.xcassets */,
 				AE15EDEA1DFEDE6F007C97BB /* LaunchScreen.storyboard */,
 				AE15EDED1DFEDE6F007C97BB /* Info.plist */,
-				AE15EDF31DFEDF78007C97BB /* Device.swift */,
-				AE15EDF51DFEF440007C97BB /* HSBColorPicker.swift */,
+				AE15EDE81DFEDE6F007C97BB /* Assets.xcassets */,
 			);
 			path = MagicLightLE;
 			sourceTree = "<group>";
