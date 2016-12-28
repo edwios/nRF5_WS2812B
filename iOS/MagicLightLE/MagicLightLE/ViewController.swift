@@ -2,8 +2,8 @@
 //  ViewController.swift
 //  MagicLightLE
 //
-//  Created by Edwin Tam on 12/12/2016.
-//  Copyright © 2016 Edwin Tam. All rights reserved.
+//  Originally copyrighted © 2016 Cloud City, Created by Evan Stone on 4/9/16.
+//  Adapted by Edwin Tam on 12/12/2016.
 //
 
 import UIKit
@@ -217,29 +217,6 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         circleLayer.strokeColor = self.apple_rgbcolor.cgColor
         circleLayer.fillColor = UIColor.clear.cgColor
         circleDrawn = true
-    }
-    
-    func drawArc() {
-        circleView.isHidden = false
-        let arcLayer = CAShapeLayer()
-        arcLayer.path = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: circleView.frame.width, height: circleView.frame.height)).cgPath
-        circleView.layer.addSublayer(arcLayer)
-        arcLayer.lineWidth = 8
-        arcLayer.strokeColor = UIColor.orange.cgColor
-        arcLayer.fillColor = UIColor.clear.cgColor
-        circleDrawn = true
-    }
-    
-    func tensValue(_ temperature:Int) -> Int {
-        var temperatureTens = 10;
-        if (temperature > 1999) {
-            if (temperature > 9999) {
-                temperatureTens = 100;
-            } else {
-                temperatureTens = 10 * Int(floor( Double(temperature / 1000) + 0.5 ))
-            }
-        }
-        return temperatureTens
     }
     
     func displayColor(_ data:Data) {

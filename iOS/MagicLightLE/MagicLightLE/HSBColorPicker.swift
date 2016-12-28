@@ -2,8 +2,8 @@
 //  ColorPickerView.swift
 //  MagicLightLE
 //
-//  Created by Edwin Tam on 12/12/2016.
-//  Copyright © 2016 Edwin Tam. All rights reserved.
+//  Originally written by Joel Teply.
+//  Adapted by Edwin Tam with bug fixes on 12/12/2016.
 //
 
 import Foundation
