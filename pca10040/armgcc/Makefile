@@ -10,8 +10,6 @@ $(OUTPUT_DIRECTORY)/nrf52832_xxaa.out: \
 # Source files common to all targets
 
 SRC_FILES += \
-  $(PROJ_DIR)/../../examples/bsp/bsp.c \
-  $(PROJ_DIR)/../../examples/bsp/bsp_btn_ble.c \
   $(PROJ_DIR)/ble_service.c \
   $(PROJ_DIR)/i2s_ws2812b_drive/i2s_ws2812b_drive.c \
   $(PROJ_DIR)/main.c \
@@ -37,6 +35,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/ble/peer_manager/pm_mutex.c \
   $(SDK_ROOT)/components/ble/peer_manager/security_dispatcher.c \
   $(SDK_ROOT)/components/ble/peer_manager/security_manager.c \
+  $(SDK_ROOT)/components/boards/boards.c \
   $(SDK_ROOT)/components/drivers_nrf/clock/nrf_drv_clock.c \
   $(SDK_ROOT)/components/drivers_nrf/common/nrf_drv_common.c \
   $(SDK_ROOT)/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
@@ -45,6 +44,8 @@ SRC_FILES += \
   $(SDK_ROOT)/components/drivers_nrf/timer/nrf_drv_timer.c \
   $(SDK_ROOT)/components/drivers_nrf/uart/nrf_drv_uart.c \
   $(SDK_ROOT)/components/libraries/button/app_button.c \
+  $(SDK_ROOT)/components/libraries/bsp/bsp.c \
+  $(SDK_ROOT)/components/libraries/bsp/bsp_btn_ble.c \
   $(SDK_ROOT)/components/libraries/fds/fds.c \
   $(SDK_ROOT)/components/libraries/fifo/app_fifo.c \
   $(SDK_ROOT)/components/libraries/fstorage/fstorage.c \
@@ -68,7 +69,6 @@ SRC_FILES += \
   
 # Include folders common to all targets
 INC_FOLDERS += \
-  $(PROJ_DIR)/../../examples/bsp \
   $(PROJ_DIR)/config \
   $(PROJ_DIR)/i2s_ws2812b_drive \
   $(PROJ_DIR)/ws2812b_drive \
@@ -102,6 +102,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/common \
   $(SDK_ROOT)/components/ble/nrf_ble_qwr \
   $(SDK_ROOT)/components/ble/peer_manager \
+  $(SDK_ROOT)/components/boards \
   $(SDK_ROOT)/components/device \
   $(SDK_ROOT)/components/drivers_nrf/adc \
   $(SDK_ROOT)/components/drivers_nrf/clock \
@@ -128,6 +129,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/drivers_nrf/uart \
   $(SDK_ROOT)/components/drivers_nrf/wdt \
   $(SDK_ROOT)/components/libraries/button \
+  $(SDK_ROOT)/components/libraries/bsp \
   $(SDK_ROOT)/components/libraries/crc16 \
   $(SDK_ROOT)/components/libraries/crc32 \
   $(SDK_ROOT)/components/libraries/csense \
